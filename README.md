@@ -30,6 +30,10 @@ docker compose up --build
 
 This starts a Jupyter environment (`jupyter/datascience-notebook` base image) with `code/scripts`, `code/build`, and `code/analysis` mounted in. Add new Python/R/etc. dependencies to `code/requirements.txt` and `code/Dockerfile`.
 
+### Julia
+
+The same container also runs Julia 1.12 in Jupyter (kernel **Julia 1.12 (project)**), using the project environment in `code/scripts/julia/` (`Project.toml`/`Manifest.toml`). See [code/scripts/julia/README.md](code/scripts/julia/README.md) for usage, adding packages, and the native (juliaup + VS Code) alternative.
+
 ## Working with KLC (Kellogg Linux Cluster)
 
 Workflow: (1) connect and work on KLC, with JupyterLab reached through SSH; (2) test code locally in a container that recreates the KLC environment, or process samples there when KLC is unavailable; (3) run on KLC; (4) commit and push from KLC when needed, and keep a log of the files available there.

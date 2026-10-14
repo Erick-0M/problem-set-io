@@ -1,0 +1,2 @@
+# Project-local Julia environment. Add packages with `] add <Pkg>` (or Pkg.add) inside the
+# "Julia 1.12 (project)" kernel, then commit Project.toml and Manifest.toml.
