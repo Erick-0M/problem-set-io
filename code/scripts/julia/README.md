@@ -23,6 +23,14 @@ How it is built (`code/Dockerfile`): the official Julia 1.12.5 tarball is unpack
 (arch-aware for Apple Silicon and x86), the depot lives in `/opt/julia_depot` (owned by the
 notebook user), and IJulia registers the `julia-project` kernel. Change `JULIA_VERSION` to upgrade.
 
+## Reproducibility
+
+`Project.toml` lists the direct dependencies (DataFrames, Distributions, FastGaussQuadrature, FiniteDiff,
+LaTeXStrings, Optim, Plots, ReadStatTables, StatsBase) and `Manifest.toml` pins every version (Julia 1.12.5).
+Always run against this environment, never the global one, and commit both files after any `Pkg.add`/`Pkg.update`.
+Recreate it anywhere with `julia --project=code/scripts/julia -e 'using Pkg; Pkg.instantiate()'`.
+Keep tools (IJulia, Revise) in the global environment, not here.
+
 ## Native (alternative, no Docker)
 
 Julia is managed with [juliaup](https://github.com/JuliaLang/juliaup) (`juliaup status`; 1.12.x is installed on the author's Mac).
@@ -33,7 +41,7 @@ julia --project=code/scripts/julia -e 'using Pkg; Pkg.instantiate()'
 
 Best native interface: **VS Code + the Julia extension** (run `.jl` files and `# %%` cells with the
 integrated REPL, plots and variable viewer), opening the repo and selecting `code/scripts/julia` as the
-environment. For notebooks, `using Pkg; Pkg.add("IJulia")` in the global env, then
+environment. Native notebook kernel: **Julia (problem-set)** (`julia-problem-set`, created with `IJulia.installkernel("Julia (problem-set)", "--project=<repo>/code/scripts/julia"; specname="julia-problem-set")`; select it in VS Code). Check with `Base.active_project()`. Otherwise, `using Pkg; Pkg.add("IJulia")` in the global env, then
 `julia --project=code/scripts/julia -e 'using IJulia; notebook(detached=true)'` (or pick the Julia kernel
 in VS Code / Jupyter). Native and Docker use the same `Manifest.toml`; keep the Julia minor version
 (1.12) aligned or the manifest will be re-resolved.
