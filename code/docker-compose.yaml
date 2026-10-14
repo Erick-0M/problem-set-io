@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  opt:
+    container_name: research-container
+    build: .
+    volumes:
+      - ./build:/home/repo-intro/build
+      - ./analysis:/home/repo-intro/analysis
+      - ./scripts:/home/repo-intro/scripts
+      - ./gcp-shared-config:/home/repo-intro/gcloud-config:ro
+    environment:
+      - JUPYTER_TOKEN=
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/repo-intro/gcloud-config/application_default_credentials.json
+    ports:
+      - 8896:8888
+
+  # klc-sim: second container (CLAUDE.md requires documenting why). LOCAL ONLY, never run
+  # it on KLC. Recreates the KLC software environment (RHEL 8.10, Python 3.13, shared-env
+  # package versions; see Dockerfile.klc) to test code before running it on KLC, or to
+  # process data in code/build/input/klc/samples/ when KLC is unavailable. The existing
+  # `opt` container cannot serve: it is a Jupyter/Ubuntu image with different Python and
+  # package versions. No Slurm, no Jupyter; run scripts with
+  # `docker compose --profile klc run --rm klc-sim python scripts/<script>.py`.
+  klc-sim:
+    container_name: klc-sim-container
+    build:
+      context: .
+      dockerfile: Dockerfile.klc
+    volumes:
+      - ./build:/home/repo-intro/build
+      - ./analysis:/home/repo-intro/analysis
+      - ./scripts:/home/repo-intro/scripts
+    environment:
+      - DATA_ROOT=/home/repo-intro/build/input/klc/samples
+    profiles: ["klc"]

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Git hook for the clone on KLC: marks every commit made there as run in KLC.
+# Installed on KLC with: git config core.hooksPath code/scripts/klc/hooks
+case "$(hostname)" in
+  klc*) grep -q '^Run in KLC' "$1" || printf '\nRun in KLC (host: %s)\n' "$(hostname)" >> "$1" ;;
+esac

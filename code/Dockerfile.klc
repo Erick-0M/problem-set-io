@@ -1,0 +1,16 @@
+# LOCAL-ONLY container recreating the KLC software environment (RHEL 8.10, Python 3.13,
+# KLC shared-environment package versions + project extras). Use it to test code before
+# running it on KLC, or to process data when KLC is not available.
+# NEVER run Docker on KLC. It does not reproduce Slurm, hardware, or KLC filesystems.
+FROM rockylinux:8
+
+RUN dnf -y install python3.11 python3.11-pip gcc gcc-c++ && dnf clean all
+RUN pip3.11 install --no-cache-dir uv && uv venv --python 3.13.2 /opt/venv
+ENV VIRTUAL_ENV=/opt/venv PATH="/opt/venv/bin:${PATH}"
+
+WORKDIR /home/repo-intro
+COPY requirements.klc-base.txt requirements.klc.txt ./
+RUN uv pip install --no-cache -r requirements.klc.txt
+
+RUN mkdir -p build analysis scripts
+CMD ["bash"]

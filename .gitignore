@@ -1,0 +1,50 @@
+# OS
+.DS_Store
+
+# Data (raw/intermediate/output data should never be committed)
+code/build/input/*
+code/build/interm/*
+code/build/outputs/*
+code/analysis/input/*
+code/analysis/interm/*
+
+# Keep folder structure without keeping contents
+!code/build/input/.gitkeep
+!code/build/input/klc/
+code/build/input/klc/*
+!code/build/input/klc/klc_manifest.csv
+!code/build/input/klc/klc_file_log.csv
+!code/build/input/klc/samples/
+code/build/input/klc/samples/*
+!code/build/input/klc/samples/.gitkeep
+!code/build/interm/.gitkeep
+!code/build/outputs/.gitkeep
+!code/analysis/input/.gitkeep
+!code/analysis/interm/.gitkeep
+!code/analysis/outputs/.gitkeep
+
+# Credentials
+code/scripts/klc/klc.config.local
+code/scripts/klc/.klc_ssh_config
+code/gcp-shared-config/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Jupyter/venv
+.venv/
+venv/
+
+# LaTeX build artifacts and the tectonic engine binary (large, platform-specific)
+references/paper/tectonic
+*.aux
+*.log
+*.blg
+*.bbl
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz

@@ -1,0 +1,17 @@
+# Project packages installed on top of the KLC shared environment (as you would on KLC).
+-r requirements.klc-base.txt
+dbfread
+linearmodels
+geopandas
+google-cloud-bigquery
+pandas-gbq
+google-cloud-storage
+pyarrow
+gcsfs
+tqdm
+polars
+bigframes
+pyreadstat
+pyblp
+pdfplumber
+rapidfuzz

@@ -1,0 +1,83 @@
+{
+  "model": "opusplan",
+  "fallbackModel": ["sonnet"],
+  "attribution": {
+    "commit": "Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>",
+    "pr": "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git ls-remote*)",
+      "Bash(gh issue view*)",
+      "Bash(gh issue list*)",
+      "Bash(gh issue comment*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(latexmk*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)",
+      "Bash(gh pr merge*)",
+      "Bash(git merge*)",
+      "Read(code/gcp-shared-config/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' | { read -r cmd; echo \"$cmd\" | grep -qE '(^|[;&|[:space:]])git add (-A|--all)([[:space:]]|$)|(^|[;&|[:space:]])git add \\.([[:space:]]|$)' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Bare git add -A/--all/. is disallowed by CLAUDE.md \\u2014 stage specific files by name instead.\"}}'; }"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' | { read -r cmd; echo \"$cmd\" | grep -qE 'git (commit|push).*(--no-verify|--no-gpg-sign)|commit\\.gpgsign=false' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Skipping hooks or commit signing (--no-verify/--no-gpg-sign/commit.gpgsign=false) is disallowed unless the user explicitly asked for it.\"}}'; }"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' | { read -r cmd; case \"$cmd\" in *\"gh issue comment\"*|*\"gh pr comment\"*|*\"gh pr create\"*|*\"gh issue create\"*) bad=$(echo \"$cmd\" | grep -oE '!\\[[^]]*\\]\\(https?://[^) ]+\\)' | grep -viE '\\(https://raw\\.githubusercontent\\.com'); if [ -n \"$bad\" ]; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"This repo is private \\u2014 embed images via raw.githubusercontent.com links (verified to render), not other hosts.\"}}'; fi ;; esac; }"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; case \"$f\" in *.tex) if command -v latexmk >/dev/null 2>&1; then latexmk -pdf -interaction=nonstopmode -halt-on-error -cd \"$f\" 2>&1 | tail -80; grep -E 'Overfull|Underfull' \"${f%.tex}.log\" 2>/dev/null | tail -20; else echo 'latexmk not found on PATH -- install a TeX distribution to enable auto-recompile' >&2; fi ;; esac; }",
+            "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/close-issue-end-session.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-unpushed.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
