@@ -1,7 +1,7 @@
 module blp
 
-    using MAT, DataFrames, Statistics, Plots, LinearAlgebra, Optim, NLSolversBase
-
+    using MAT, DataFrames, Statistics, Plots, LinearAlgebra, Optim, NLSolversBase, Random, LinearAlgebra, BlockDiagonals
+    
 
     struct BLPData
         T::Int
@@ -271,4 +271,197 @@ module blp
     end
 
 
+    function compute_hausman(model)
+
+        # Computing Hausman style instrument for price
+        price_bar = zeros(model.J*model.T, 1)
+        ts = sum(reshape(model.p, (model.J, model.T)), dims = 2)
+
+        for m_i in 1: model.T
+            idx = (m_i - 1)* model.J + 1:m_i* model.J
+            price_bar[idx, :] = (ts - model.p[idx, :])/(model.T-1)
+
+        end
+
+        return price_bar
+
+    end
+
+
+    function compute_blp(model)
+
+        X_rivals = zeros(model.J*model.T, model.k - 1)
+        for m_i in 1:model.T
+            idx = (m_i - 1) * model.J + 1: (m_i) * model.J
+            X_rivals[idx, :] = (sum(model.X[idx, :], dims = 1) .- model.X[idx, :])
+        end
+        X_rivals = X_rivals[:, 2:end];
+        return X_rivals
+
+    end
+
+    function estimate_blp!(model; Z = nothing, W = nothing, sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000)
+        
+        model.Z = something(Z, model.Z);
+        model.W = something(W, model.W);
+
+        model.k_Z = size(model.Z, 2);
+        model.M =  (I -  model.X_all * inv(model.X_all' * model.Z * model.W * model.Z' * model.X_all) * model.X_all'* model.Z * model.W * model.Z');
+        
+
+        # Seed globally
+        Random.seed!(704)
+
+        sigma0_ = clamp.(randn(Ns) * 0.5 .+ 1, sigma_lower, sigma_upper);
+
+        
+        function estimate_model(sigma0)
+
+            res = optimize(NLSolversBase.only_fg!((F, G, s) -> blp.gmm_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()))
+            return res
+
+        end
+        
+        ress = estimate_model.(sigma0_);
+
+        idmin = argmin(Optim.minimum.(ress));
+        optimized = ress[idmin];
+
+        sigma_est = Optim.minimizer(optimized)[1];
+        model.sigma = sigma_est
+        # Get the estimates for delta
+        delta = blp.contraction(model, model.sigma);
+        # Get the estimates for beta
+        beta_est =  inv(model.X_all' * model.Z * model.W * model.Z' * model.X_all) * model.X_all'* model.Z * model.W * model.Z' * delta;
+
+        model.delta = delta;
+        model.xi = model.M * model.delta;
+        model.beta = beta_est;
+        model.opt_res = ress
+        model.params = vcat(beta_est, [sigma_est])
+        blp.simulate_BLP!(model, all = true);
+
+        omega_var = zeros(model.k_Z, model.k_Z)
+
+        for jt_i in 1: model.T * model.J
+            omega_var += 1/(model.J * model.T) * (model.xi[jt_i]^2) * model.Z[jt_i,:] * model.Z[jt_i,:]'
+        end
+
+        Gamma = 1/(model.J * model.T) * model.Z' * hcat(-model.X_all, model.grad);
+        Var = inv(Gamma' * model.W * Gamma) * Gamma' * model.W * omega_var * model.W * Gamma * inv(Gamma' * model.W * Gamma) / (model.J * model.T);
+
+        model.Var = Var
+
+    end
+
+
+    function gmm_joint_fg!(F, G, model, sigma; toler = 1e-10, max_iter = 10000)
+
+        delta = blp.contraction(model.BLPDemand, sigma, toler = toler, max_iter = max_iter);
+        # Update beta before computing cost
+        model.BLPDemand.beta = inv(model.BLPDemand.X_all' * model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z' * model.BLPDemand.X_all) * model.BLPDemand.X_all'* model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z' * delta;
+        shares, cost = blp.simulate_BLP!(model.BLPDemand, delta = delta, sigma = sigma, supply = true);
+        model.BLPSupply.beta = inv(model.BLPSupply.X' * model.BLPSupply.Z * model.BLPSupply.W * model.BLPSupply.Z' * model.BLPSupply.X) * model.BLPSupply.X'* model.BLPSupply.Z * model.BLPSupply.W * model.BLPSupply.Z' * cost;
+        e_xi = model.BLPDemand.M * delta;
+        e_omega = model.BLPSupply.M * cost;
+        moments = [model.BLPDemand.Z' * e_xi;
+                model.BLPSupply.Z' * e_omega;
+                ]
+        W_g = BlockDiagonal([model.BLPDemand.W, model.BLPSupply.W]);
+
+        # Initialize beta properly in the demand side to compute the gradient properly
+        
+
+        if G !== nothing
+            
+            grad_, dc_dsigma_, dc_dbetap_ = blp.simulate_BLP!(model.BLPDemand, delta = delta, sigma = sigma, return_grad = true, supply = true);
+            B = inv(model.BLPDemand.X_all' * model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z' * model.BLPDemand.X_all) * model.BLPDemand.X_all' * model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z';
+            dc_dsigma_total = dc_dsigma_ .+ dc_dbetap_ .* ((B * grad_)[end]) # We need to add the impact of the change of sigma in the cost through changes in beta
+            G_demand = 2 * grad_' * model.BLPDemand.Z * model.BLPDemand.W *  model.BLPDemand.Z' * e_xi;
+            G_supply = 2 * dc_dsigma_total' * model.BLPSupply.Z * model.BLPSupply.W *  model.BLPSupply.Z' * e_omega;
+            G .= G_demand + G_supply
+
+        end
+
+        if F !== nothing
+            return (moments' * W_g * moments)[]
+        end
+    
+    end
+
+    function estimate_blp_joint!(model; sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000)
+        # Seed globally
+        Random.seed!(704)
+
+        sigma0_ = clamp.(randn(Ns) * 0.5 .+ 1, sigma_lower, sigma_upper);
+
+        
+        function estimate_model(sigma0)
+            res = optimize(NLSolversBase.only_fg!((F, G, s) -> gmm_joint_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()))
+            return res
+        end
+
+        ress = estimate_model.(sigma0_);
+        
+        idmin = argmin(Optim.minimum.(ress));
+        optimized = ress[idmin];
+        sigma_est = Optim.minimizer(optimized)[1];
+        model.BLPDemand.sigma = sigma_est
+        # Get the estimates for delta
+        delta = blp.contraction(model.BLPDemand, model.BLPDemand.sigma);
+
+        # Get the estimates for beta
+        blp.simulate_BLP!(model.BLPDemand, all = true);
+
+        beta_est =  inv(model.BLPDemand.X_all' * model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z' * model.BLPDemand.X_all) * model.BLPDemand.X_all'* model.BLPDemand.Z * model.BLPDemand.W * model.BLPDemand.Z' * model.BLPDemand.delta;
+        beta_supply =inv(model.BLPSupply.X' * model.BLPSupply.Z * model.BLPSupply.W * model.BLPSupply.Z' * model.BLPSupply.X) * model.BLPSupply.X'* model.BLPSupply.Z * model.BLPSupply.W * model.BLPSupply.Z' * model.BLPDemand.cost_sim;
+
+        model.BLPDemand.delta = delta;
+        model.BLPDemand.xi = model.BLPDemand.M * model.BLPDemand.delta;
+        model.BLPDemand.beta = beta_est;
+        model.BLPDemand.opt_res = ress
+
+        model.BLPSupply.beta = beta_supply;
+
+        
+        d, s = model.BLPDemand, model.BLPSupply
+        N  = d.T * d.J
+        kb = size(d.X_all, 2)       # demand linear params (price is the last one)
+        kc = size(s.X, 2)           # cost shifters
+        kd = size(d.Z, 2)
+        ks = size(s.Z, 2)
+
+        # Everything evaluated at the estimates
+        grad, dc_dsigma, dc_dbetap = blp.simulate_BLP!(d, delta = d.delta, sigma = d.sigma, return_grad = true, supply = true)
+        _, cost = blp.simulate_BLP!(d, delta = d.delta, sigma = d.sigma, supply = true)
+
+        xi    = d.M * d.delta       # demand residual
+        omega = s.M * cost          # supply residual
+
+        # Jacobians of the residuals wrt θ = [β; γ; σ]
+        dxi    = hcat(-d.X_all, zeros(N, kc), grad)
+        domega = hcat(zeros(N, kb - 1), dc_dbetap, -s.X, dc_dsigma)
+
+        # Γ = ∂ĝ/∂θ'
+        Gamma = vcat(d.Z' * dxi, s.Z' * domega) ./ N
+
+        # Moment covariance (full, keeps the ξ–ω cross block)
+        g = hcat(d.Z .* xi, s.Z .* omega)               # N × (kd + ks)
+        
+        S = g' * g ./ N
+
+        Wg = [d.W zeros(kd, ks); zeros(ks, kd) s.W]
+        B  = inv(Gamma' * Wg * Gamma)
+        V  = B * Gamma' * Wg * S * Wg * Gamma * B ./ N
+
+
+        model.params = vcat( model.BLPDemand.beta, model.BLPSupply.beta, [sigma_est])
+        model.Var = V
+
+    end
+
+
+    
+
 end
+
