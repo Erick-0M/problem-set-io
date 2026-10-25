@@ -1,0 +1,16 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Elasticity of product 3's share with respect to the price of product 2: real versus simulated ($T=100$ markets).}\label{tab:q8d_cell_32}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrr}
+\toprule
+ & Mean & SD & Median & Q25 & Q75 \\
+\midrule
+Real & 1.441 & 1.061 & 1.253 & 0.514 & 2.136 \\
+Simulated & 1.415 & 1.041 & 1.231 & 0.504 & 2.091 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Element $(3,2)$ of the elasticity matrix $\partial s_j/\partial p_k\cdot p_k/s_j$ across the 100 markets; simulated uses the Q8c estimates, real uses the true parameters.}
+\end{table}

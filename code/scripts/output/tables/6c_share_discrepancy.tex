@@ -1,0 +1,25 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Share discrepancies and adding-up checks (observed versus simulated at the true parameters).}\label{tab:q6c_shares}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & Mean & SD & Median & Q25 & Q75 & Max abs. \\
+\midrule
+\multicolumn{7}{l}{\emph{$J=3$}} \\
+\quad Inside: observed $-$ simulated & $-3.01\times 10^{-18}$ & $7.24\times 10^{-17}$ & 0 & $-1.39\times 10^{-17}$ & $6.94\times 10^{-18}$ & $3.89\times 10^{-16}$ \\
+\quad Outside: observed $-$ simulated & $2.71\times 10^{-17}$ & $3.38\times 10^{-16}$ & 0 & $-1.60\times 10^{-16}$ & $2.22\times 10^{-16}$ & $1.05\times 10^{-15}$ \\
+\quad $\sum_j s_{jt}+s_{0t}-1$, observed & 0 & 0 & 0 & 0 & 0 & 0 \\
+\quad $\sum_j \hat s_{jt}+\hat s_{0t}-1$, simulated & $-2.11\times 10^{-17}$ & $3.42\times 10^{-16}$ & 0 & $-2.22\times 10^{-16}$ & $2.22\times 10^{-16}$ & $9.99\times 10^{-16}$ \\
+\addlinespace
+\multicolumn{7}{l}{\emph{$J=5$}} \\
+\quad Inside: observed $-$ simulated & $6.42\times 10^{-6}$ & $4.81\times 10^{-3}$ & $6.76\times 10^{-6}$ & $-7.79\times 10^{-4}$ & $8.21\times 10^{-4}$ & $2.23\times 10^{-2}$ \\
+\quad Outside: observed $-$ simulated & $-3.21\times 10^{-5}$ & $5.55\times 10^{-3}$ & $-1.10\times 10^{-5}$ & $-1.19\times 10^{-3}$ & $7.30\times 10^{-4}$ & $2.10\times 10^{-2}$ \\
+\quad $\sum_j s_{jt}+s_{0t}-1$, observed & 0 & 0 & 0 & 0 & 0 & 0 \\
+\quad $\sum_j \hat s_{jt}+\hat s_{0t}-1$, simulated & $1.22\times 10^{-17}$ & $4.91\times 10^{-16}$ & 0 & $-3.33\times 10^{-16}$ & $2.22\times 10^{-16}$ & $1.33\times 10^{-15}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Inside rows: product-market observations; outside and adding-up rows: markets. Simulated shares average the logit choice probabilities over the $R=500$ draws; the outside share is $1/(1+\sum_j e^{u_{ijt}})$ averaged the same way. The observed outside share is $1-\sum_j s_{jt}$ by construction, so its adding-up row is zero up to rounding.}
+\end{table}

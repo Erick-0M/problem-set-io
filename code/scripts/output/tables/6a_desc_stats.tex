@@ -1,0 +1,19 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Prices, markups and profits: $J=3$ versus $J=5$ (true parameters, product-market observations).}\label{tab:q6a_desc}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+& \multicolumn{5}{c}{$J=3$} & \multicolumn{5}{c}{$J=5$} \\
+\cmidrule(lr){2-6} \cmidrule(lr){7-11}
+ & Mean & SD & Median & Q25 & Q75 & Mean & SD & Median & Q25 & Q75 \\
+\midrule
+Price & 3.027 & 1.371 & 2.828 & 1.988 & 3.964 & 1.891 & 1.435 & 1.816 & 0.780 & 2.830 \\
+Markup & 0.472 & 0.634 & 0.274 & 0.197 & 0.574 & 1.251 & 3.595 & 0.334 & 0.234 & 0.844 \\
+Profit & 0.309 & 0.463 & 0.105 & 0.021 & 0.353 & 0.254 & 0.514 & 0.041 & 0.004 & 0.225 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Pooled over products and markets (300 observations for $J=3$, 500 for $J=5$; 475 markups for $J=5$). Markup is $(p-c)/p$. 25 $J=5$ observations with markup $<-1$ are excluded from the markup row and from the markup figure. The markup figure also truncates the x-axis at the 95th percentile.}
+\end{table}

@@ -1,0 +1,17 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Consumer surplus per market: $J=3$ versus $J=5$ (true parameters).}\label{tab:q6b_cs}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+& \multicolumn{5}{c}{$J=3$} & \multicolumn{5}{c}{$J=5$} \\
+\cmidrule(lr){2-6} \cmidrule(lr){7-11}
+ & Mean & SD & Median & Q25 & Q75 & Mean & SD & Median & Q25 & Q75 \\
+\midrule
+Consumer surplus & 1.314 & 0.642 & 1.251 & 0.851 & 1.729 & 2.765 & 0.747 & 2.697 & 2.258 & 3.228 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize 100 markets per dataset; both datasets use the same $R=500$ consumer draws.}
+\end{table}

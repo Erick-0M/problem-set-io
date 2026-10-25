@@ -1,0 +1,30 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Joint demand and supply estimates under three conduct assumptions ($T=100$, $J=3$).}\label{tab:q9e_estimates}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrr}
+\toprule
+ & Truth & Nash-Bertrand & Perfect competition & Collusion \\
+\midrule
+Intercept & 5.000 & 5.017 & 5.003 & 3.995 \\
+ &  & (0.397) & (0.397) & (1.066) \\
+$x_{2}$ & 1.000 & 0.974 & 0.971 & 0.759 \\
+ &  & (0.226) & (0.226) & (0.266) \\
+$x_{3}$ & 1.000 & 1.039 & 1.037 & 0.880 \\
+ &  & (0.076) & (0.076) & (0.146) \\
+Price coefficient $\bar\alpha$ & 1.000 & 0.983 & 0.980 & 0.754 \\
+ &  & (0.113) & (0.113) & (0.278) \\
+Cost intercept $\gamma_0$ & 2.000 & 1.940 & 2.951 & $-$1.174 \\
+ &  & (0.074) & (0.055) & (0.417) \\
+Cost on $z_{jt}$ ($\gamma_2$) & 1.000 & 0.916 & 0.790 & 0.581 \\
+ &  & (0.056) & (0.051) & (0.585) \\
+Cost on $w_j$ ($\gamma_1$) & 1.000 & 0.979 & 0.776 & 0.627 \\
+ &  & (0.075) & (0.069) & (0.715) \\
+Price heterogeneity $\sigma_\alpha$ & 1.000 & 1.009 & 1.004 & 0.659 \\
+ &  & (0.080) & (0.080) & (0.355) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Standard errors in parentheses (joint GMM sandwich with demand moments for $\xi_{jt}$ and supply moments for $\omega_{jt}$). Estimates are re-evaluated at the saved $\hat\sigma_\alpha$ (see the note in the notebook). Under perfect competition marginal cost equals price, so supply moments do not depend on $\sigma_\alpha$.}
+\end{table}

@@ -1,0 +1,17 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Convergence and contraction-mapping diagnostics by starting value ($T=100$, $J=3$).}\label{tab:q8c_convergence}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Start & $\sigma_\alpha^{0}$ & $\hat\sigma_\alpha$ & $|\hat\sigma_\alpha-\hat\sigma_\alpha^{*}|$ & Criterion & Converged & Outer iter. & $\|\nabla\|_\infty$ & Contr. iter. ($10^{-3}$) & Contr. iter. ($10^{-10}$) & Sup. error at $\hat\delta$ \\
+\midrule
+1 & 0.922 & 1.006 & $3.42\times 10^{-12}$ & $4.60\times 10^{-3}$ & yes & 4 & $1.37\times 10^{-11}$ & 315 & 3814 & $6.28\times 10^{-11}$ \\
+2$^{\dagger}$ & 1.659 & 1.006 & 0 & $4.60\times 10^{-3}$ & yes & 4 & $9.33\times 10^{-10}$ & 315 & 3814 & $5.73\times 10^{-11}$ \\
+3 & 0.449 & 1.006 & $3.43\times 10^{-12}$ & $4.60\times 10^{-3}$ & yes & 4 & $1.27\times 10^{-11}$ & 315 & 3814 & $6.28\times 10^{-11}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Optimiser: L-BFGS in a box $[0.1,10]$ on $\sigma_\alpha$ (Optim, Fminbox). Contraction iterations count steps of $\delta\leftarrow\delta+\log s^{\mathrm{obs}}-\log s(\delta;\sigma)$ from the logit starting value until the L2 norm of the update falls below the tolerance. Sup. error is $\max_{jt}|\log s^{\mathrm{obs}}_{jt}-\log s_{jt}(\hat\delta;\hat\sigma)|$ at the saved $\hat\delta$. $^{\dagger}$ marks the selected start. }
+\end{table}

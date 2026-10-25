@@ -1,0 +1,29 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Price as its own instrument versus IV estimates.}\label{tab:q8f_compare}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrr}
+\toprule
+ & Truth & IV (Q8c) & Price as instrument \\
+\midrule
+Intercept & 5.000 & 4.981 & 4.865 \\
+ &  & (0.404) & (0.341) \\
+$x_{2}$ & 1.000 & 0.966 & 0.944 \\
+ &  & (0.225) & (0.220) \\
+$x_{3}$ & 1.000 & 1.036 & 1.036 \\
+ &  & (0.076) & (0.076) \\
+Price coefficient $\bar\alpha$ & 1.000 & 0.971 & 0.924 \\
+ &  & (0.116) & (0.082) \\
+Price heterogeneity $\sigma_\alpha$ & 1.000 & 1.006 & 1.014 \\
+ &  & (0.080) & (0.080) \\
+\midrule
+\multicolumn{4}{l}{\emph{Implied objects (mean over product-markets)}} \\
+Own-price elasticity & $-$3.709 & $-$3.636 & $-$3.518 \\
+Cross-price elasticity & 1.003 & 0.984 & 0.953 \\
+Markup $(p-c)/p$ & 0.472 & 0.479 & 0.492 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize $T=100$, $J=3$. Standard errors in parentheses. Truth column for implied objects uses the true parameters; markups are model-implied under Bertrand pricing.}
+\end{table}

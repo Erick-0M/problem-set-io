@@ -1,0 +1,15 @@
+% requires: booktabs, adjustbox, float, amssymb
+\begin{table}[H]
+\centering\small
+\caption{Convergence and contraction-mapping diagnostics by starting value ($T=10$, $J=3$).}\label{tab:q8e_convergence}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Start & $\sigma_\alpha^{0}$ & $\hat\sigma_\alpha$ & $|\hat\sigma_\alpha-\hat\sigma_\alpha^{*}|$ & Criterion & Converged & Outer iter. & $\|\nabla\|_\infty$ & Contr. iter. ($10^{-3}$) & Contr. iter. ($10^{-10}$) & Sup. error at $\hat\delta$ \\
+\midrule
+1$^{\dagger}$ & 0.922 & 0.100 & 0 & $2.89\times 10^{-1}$ & yes & 3 & $3.85\times 10^{-9}$ & 49 & 10000 & $1.71\times 10^{-6}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\vspace{3pt}{\footnotesize Optimiser: L-BFGS in a box $[0.1,10]$ on $\sigma_\alpha$ (Optim, Fminbox). Contraction iterations count steps of $\delta\leftarrow\delta+\log s^{\mathrm{obs}}-\log s(\delta;\sigma)$ from the logit starting value until the L2 norm of the update falls below the tolerance. Sup. error is $\max_{jt}|\log s^{\mathrm{obs}}_{jt}-\log s_{jt}(\hat\delta;\hat\sigma)|$ at the saved $\hat\delta$. $^{\dagger}$ marks the selected start. Only one starting value was run for this model.}
+\end{table}
