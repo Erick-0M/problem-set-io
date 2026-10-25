@@ -61,6 +61,8 @@ module blp
         profit_sim::Matrix{Float64} = Matrix{Float64}(undef, T * J, 1)
         cs::Matrix{Float64}         = Matrix{Float64}(undef, T , 1)
         cs_sim::Matrix{Float64}     = Matrix{Float64}(undef, T , 1)
+        ps_sim::Matrix{Float64}     = Matrix{Float64}(undef, T , 1)
+        ts_sim::Matrix{Float64}     = Matrix{Float64}(undef, T , 1)
         grad::Matrix{Float64}       = Matrix{Float64}(undef, T * J , 1)
         Omega::Matrix{Float64}      = I(J) # Assumed perform Bertrand
         opt_res::Union{Vector{Any}, Missing} = missing # Optimized results
@@ -201,12 +203,15 @@ module blp
             model.markup_sim = markup_sim;
             model.cs_sim = cs_sim;
             model.profit_sim = (model.p - model.cost_sim) .* model.shares;
+            model.ps_sim = sum(reshape(model.profit_sim, (model.J, model.T)), dims = 1)'
+            model.ts_sim = model.cs_sim + model.ps_sim
             model.shares_sim = mean(choice, dims = 2);
             model.grad = grad;
             model.alphas = alphas;
             model.util = util;
             model.choice = choice;
             model.delta = delta;
+            model.ds_dp = ds_dp; # To compute diversion ratios
         end
 
         # Return the gradient
@@ -256,8 +261,9 @@ module blp
 
     # Merger simulation
 
-    function counterfactual(model_system::BLP; toler = 1e-3, max_iter = 1000)
+    function counterfactual_simulation(model_system::BLP; toler = 1e-8, max_iter = 10000, lambda = 0.1)
 
+        # lambda: damping weight on the new price (the undamped iteration diverges)
 
         diff = 10
         model = model_system.BLPDemand
@@ -265,10 +271,20 @@ module blp
         cost_sim = model.cost_sim
         shares_sim = model.shares_sim
         count = 1
-
+        flag = 0
 
         while toler < norm(diff)
             count += 1;
+
+            # Initializing
+            delta = model.X_all * model.beta + model.xi;
+            ds_dp = zeros(model.T * model.J, model.J);
+            util = zeros(model.J * model.T, model.R);
+            choice = zeros(model.J * model.T, model.R);
+            util_price = zeros(model.J * model.T, model.R);
+            v = -exp.(model.sigma .* model.errors);
+            alphas = model.beta[end] .+ v;
+
             # Given the shares, compute the new price
 
             for m_i in 1:model.T
@@ -284,26 +300,28 @@ module blp
                     pp = (diagm(pp_) - pp_ * pp_');
                     ds_dp[idx, :] += pp  * alphas[m_i, r_i]/model.R;
                 end
-                p_sim[idx, :] = - inv(model.Omega .* ds_dp[idx, :]) * model.shares[idx, :] + cost_sim[idx,:] ;
+                p_new = - inv(model.Omega .* ds_dp[idx, :]) * model.shares[idx, :] + cost_sim[idx,:];
+                p_sim[idx, :] = lambda .* p_new .+ (1 - lambda) .* model.p[idx, :];
                 
             end
-
-
+            p_old = copy(model.p)
             # Replace the last element of the X_all matrix
-            model.p = p_sim
-            model.X_all[:, end] = p_sim
+            model.p = deepcopy(p_sim)
+            model.X_all[:, end] = deepcopy(p_sim)
+            model.delta = model.X_all * model.beta + model.xi;
 
             # Given the new price, compute the shares
             shares_sim = simulate_BLP!(model)            
         
-            # Check convergence in shares
-            diff = norm(shares_sim - model.shares);
+            # Check convergence in prices
+            diff = maximum(abs.(p_sim - p_old));
 
             # Chaging simulated shares and real shares
             model.shares = shares_sim
             model.shares_sim = shares_sim
 
             if count > max_iter
+                flag = -1
                 println("Reached max number of iterations"
                 )
                 break
@@ -311,7 +329,12 @@ module blp
 
         end
 
-        
+        if flag == 0
+            simulate_BLP!(model, all = true)
+        end
+
+        return model_system
+
 
     end
 
