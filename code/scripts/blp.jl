@@ -167,7 +167,7 @@ module blp
 
                 if supply
                     A     = model.Omega .* ds_dp[idx, :]
-                    Ainv  = inv(A)
+                    Ainv  = Base.all(iszero, A) ? zero(A) : inv(A) # perfect competition: c = p, so dc/dθ = 0
                     s_idx = model.shares[idx, :]
                     dDelta = zeros(model.J, model.J)
                     for r_i in 1:model.R
@@ -250,6 +250,69 @@ module blp
             end
         end
         return delta
+    end
+
+
+
+    # Merger simulation
+
+    function counterfactual(model_system::BLP; toler = 1e-3, max_iter = 1000)
+
+
+        diff = 10
+        model = model_system.BLPDemand
+        p_sim = zeros(model.T * model.J, 1);
+        cost_sim = model.cost_sim
+        shares_sim = model.shares_sim
+        count = 1
+
+
+        while toler < norm(diff)
+            count += 1;
+            # Given the shares, compute the new price
+
+            for m_i in 1:model.T
+                
+                idx = (m_i - 1)* model.J + 1:m_i* model.J;
+                util_price[idx, :] = model.p[idx,:] * v[m_i, :]';
+
+                util[idx, :] .= delta[idx, :] .+ util_price[idx, :];
+                choice[idx, :] .= exp.(util[idx, :]) ./ (1 .+ sum(exp.(util[idx, :]) , dims =1));
+
+                for r_i in 1:model.R
+                    pp_ = choice[idx, r_i];
+                    pp = (diagm(pp_) - pp_ * pp_');
+                    ds_dp[idx, :] += pp  * alphas[m_i, r_i]/model.R;
+                end
+                p_sim[idx, :] = - inv(model.Omega .* ds_dp[idx, :]) * model.shares[idx, :] + cost_sim[idx,:] ;
+                
+            end
+
+
+            # Replace the last element of the X_all matrix
+            model.p = p_sim
+            model.X_all[:, end] = p_sim
+
+            # Given the new price, compute the shares
+            shares_sim = simulate_BLP!(model)            
+        
+            # Check convergence in shares
+            diff = norm(shares_sim - model.shares);
+
+            # Chaging simulated shares and real shares
+            model.shares = shares_sim
+            model.shares_sim = shares_sim
+
+            if count > max_iter
+                println("Reached max number of iterations"
+                )
+                break
+            end
+
+        end
+
+        
+
     end
 
 
@@ -397,7 +460,12 @@ module blp
 
         
         function estimate_model(sigma0)
-            res = optimize(NLSolversBase.only_fg!((F, G, s) -> gmm_joint_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()))
+            res = optimize(NLSolversBase.only_fg!((F, G, s) -> gmm_joint_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), 
+                           [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()),
+                            Optim.Options(
+                                iterations = 100
+                                )
+                            )
             return res
         end
 
