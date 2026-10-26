@@ -386,7 +386,7 @@ module blp
 
     end
 
-    function estimate_blp!(model; Z = nothing, W = nothing, sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000)
+    function estimate_blp!(model; Z = nothing, W = nothing, sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 1000, time_limit = Inf, failures = nothing)
         
         model.Z = something(Z, model.Z);
         model.W = something(W, model.W);
@@ -403,12 +403,21 @@ module blp
         
         function estimate_model(sigma0)
 
-            res = optimize(NLSolversBase.only_fg!((F, G, s) -> blp.gmm_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()))
-            return res
+            t0 = time()
+            try
+                res = optimize(NLSolversBase.only_fg!((F, G, s) -> blp.gmm_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()), Optim.Options(iterations = iterations, time_limit = time_limit))
+                println("  start sigma0 = $(round(sigma0, digits = 3)) -> sigma = $(round(Optim.minimizer(res)[1], digits = 4)), obj = $(Optim.minimum(res)), $(round(time() - t0, digits = 1))s"); flush(stdout)
+                return res
+            catch err
+                msg = sprint(showerror, err)
+                println("  start sigma0 = $(round(sigma0, digits = 3)) FAILED after $(round(time() - t0, digits = 1))s: $(first(msg, 120))"); flush(stdout)
+                failures === nothing || push!(failures, (sigma0 = sigma0, error = msg))
+                return nothing
+            end
 
         end
         
-        ress = estimate_model.(sigma0_);
+        ress = collect(Any, filter(!isnothing, estimate_model.(sigma0_)));
 
         idmin = argmin(Optim.minimum.(ress));
         optimized = ress[idmin];
@@ -475,7 +484,7 @@ module blp
     
     end
 
-    function estimate_blp_joint!(model; sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000)
+    function estimate_blp_joint!(model; sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 100, time_limit = Inf, failures = nothing)
         # Seed globally
         Random.seed!(704)
 
@@ -483,16 +492,26 @@ module blp
 
         
         function estimate_model(sigma0)
-            res = optimize(NLSolversBase.only_fg!((F, G, s) -> gmm_joint_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), 
-                           [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()),
-                            Optim.Options(
-                                iterations = 100
+            t0 = time()
+            try
+                res = optimize(NLSolversBase.only_fg!((F, G, s) -> gmm_joint_fg!(F, G, model, s, toler = toler, max_iter = max_iter)), 
+                               [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()),
+                                Optim.Options(
+                                    iterations = iterations,
+                                    time_limit = time_limit
+                                    )
                                 )
-                            )
-            return res
+                println("  start sigma0 = $(round(sigma0, digits = 3)) -> sigma = $(round(Optim.minimizer(res)[1], digits = 4)), obj = $(Optim.minimum(res)), $(round(time() - t0, digits = 1))s"); flush(stdout)
+                return res
+            catch err
+                msg = sprint(showerror, err)
+                println("  start sigma0 = $(round(sigma0, digits = 3)) FAILED after $(round(time() - t0, digits = 1))s: $(first(msg, 120))"); flush(stdout)
+                failures === nothing || push!(failures, (sigma0 = sigma0, error = msg))
+                return nothing
+            end
         end
 
-        ress = estimate_model.(sigma0_);
+        ress = collect(Any, filter(!isnothing, estimate_model.(sigma0_)));
         
         idmin = argmin(Optim.minimum.(ress));
         optimized = ress[idmin];
