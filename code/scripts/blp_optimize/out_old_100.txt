@@ -1,9 +1,0 @@
-
-[69873] signal 15: Terminated: 15
-in expression starting at /Users/erickom/Documents/GitHub/problem-set-io/code/scripts/blp_optimize/bench.jl:18
-__psynch_cvwait at /usr/lib/system/libsystem_kernel.dylib (unknown line)
-unknown function (ip: 0x0) at (unknown file)
-dgemm_kernel_NEOVERSEN1 at /Users/erickom/.julia/juliaup/julia-1.12.5+0.aarch64.apple.darwin14/Julia-1.12.app/Contents/Resources/julia/lib/julia/libopenblas64_.dylib (unknown line)
-unknown function (ip: 0x0) at (unknown file)
-Allocations: 272884462 (Pool: 272882896; Big: 1566); GC: 11167
-Reached max number of iterations
