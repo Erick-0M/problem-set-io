@@ -399,6 +399,10 @@ module blp
         results = Vector{Any}(nothing, Ns)
         lk = ReentrantLock()
 
+        # One BLAS thread per Julia thread: avoids oversubscription when the starts run in parallel
+        blas_threads = BLAS.get_num_threads()
+        Threads.nthreads() > 1 && BLAS.set_num_threads(1)
+
         Threads.@threads :dynamic for i in 1:Ns
             sigma0 = sigma0_[i]
             t0 = time()
@@ -416,6 +420,8 @@ module blp
                 end
             end
         end
+
+        BLAS.set_num_threads(blas_threads)
 
         ress = collect(Any, filter(!isnothing, results));
         isempty(ress) && error("all $Ns starting points failed")
