@@ -389,7 +389,7 @@ module blp
     # Minimise over sigma from Ns random starts, one start per task (Threads). make_fg() must return an
     # fg! closure that owns whatever state it mutates, so starts never share mutable data.
     # Returns the Optim results of the starts that did not error, in start order.
-    function multistart(make_fg; sigma_lower, sigma_upper, Ns, iterations, time_limit, failures)
+    function multistart(make_fg; sigma_lower, sigma_upper, Ns, iterations, time_limit, failures, outer_iterations = 1000)
 
         # Seed globally
         Random.seed!(704)
@@ -407,7 +407,7 @@ module blp
             sigma0 = sigma0_[i]
             t0 = time()
             try
-                res = optimize(NLSolversBase.only_fg!(make_fg()), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()), Optim.Options(iterations = iterations, time_limit = time_limit))
+                res = optimize(NLSolversBase.only_fg!(make_fg()), [sigma_lower], [sigma_upper], [sigma0], Fminbox(LBFGS()), Optim.Options(iterations = iterations, outer_iterations = outer_iterations, time_limit = time_limit))
                 lock(lk) do
                     println("  start sigma0 = $(round(sigma0, digits = 3)) -> sigma = $(round(Optim.minimizer(res)[1], digits = 4)), obj = $(Optim.minimum(res)), $(round(time() - t0, digits = 1))s"); flush(stdout)
                 end
@@ -429,7 +429,7 @@ module blp
 
     end
 
-    function estimate_blp!(model; Z = nothing, W = nothing, sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 1000, time_limit = Inf, failures = nothing)
+    function estimate_blp!(model; Z = nothing, W = nothing, sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 1000, time_limit = Inf, failures = nothing, outer_iterations = 1000)
 
         model.Z = something(Z, model.Z);
         model.W = something(W, model.W);
@@ -439,7 +439,7 @@ module blp
 
         # gmm_fg! only reads the model, so starts share it; each start has its own warm-start cache
         ress = multistart(() -> (F, G, s) -> gmm_fg!(F, G, model, s, toler = toler, max_iter = max_iter, warm = Ref{Matrix{Float64}}());
-                          sigma_lower, sigma_upper, Ns, iterations, time_limit, failures)
+                          sigma_lower, sigma_upper, Ns, iterations, time_limit, failures, outer_iterations)
 
         optimized = ress[argmin(Optim.minimum.(ress))];
 
@@ -499,13 +499,13 @@ module blp
 
     end
 
-    function estimate_blp_joint!(model; sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 100, time_limit = Inf, failures = nothing)
+    function estimate_blp_joint!(model; sigma_lower = 0.1, sigma_upper = 10, Ns = 10, toler = 1e-10, max_iter = 10000, iterations = 100, time_limit = Inf, failures = nothing, outer_iterations = 1000)
 
         d, s = model.BLPDemand, model.BLPSupply
 
         # gmm_joint_fg! mutates beta, so each start works on its own copy of the system
         ress = multistart(() -> (m = deepcopy(model); w = Ref{Matrix{Float64}}(); (F, G, sg) -> gmm_joint_fg!(F, G, m, sg, toler = toler, max_iter = max_iter, warm = w));
-                          sigma_lower, sigma_upper, Ns, iterations, time_limit, failures)
+                          sigma_lower, sigma_upper, Ns, iterations, time_limit, failures, outer_iterations)
 
         optimized = ress[argmin(Optim.minimum.(ress))];
         sigma_est = Optim.minimizer(optimized)[1];
