@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{graphicx,booktabs,adjustbox,float}
+\usepackage{graphicx,booktabs,adjustbox,float,subcaption}
 \usepackage[T1]{fontenc}
 % Keep output/{figures,tables,overleaf}/ together in Overleaf and compile output/overleaf/main.tex
 \graphicspath{{../figures/}}
@@ -17,9 +17,12 @@
 
 % ---- Q6a ----
 \subsection*{6a}
-\figitem{q6a_hist_prices.pdf}{Distribution of price, $J=3$ versus $J=5$ (tails beyond the 1st and 99th percentiles not drawn).}{fig:q6a_hist_prices}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
-\figitem{q6a_hist_markups.pdf}{Distribution of markup, $J=3$ versus $J=5$ (tails beyond the 5th and 95th percentiles not drawn).}{fig:q6a_hist_markups}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
-\figitem{q6a_hist_profits.pdf}{Distribution of profit, $J=3$ versus $J=5$ (tails beyond the 5th and 95th percentiles not drawn).}{fig:q6a_hist_profits}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
+\begin{figure}[H]\centering\caption{Prices, markups and profits, $J=3$ versus $J=5$ (tails not drawn).}\label{fig:grp_q6a}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6a_hist_prices.pdf}\caption{Prices}\label{fig:q6a_hist_prices}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6a_hist_markups.pdf}\caption{Markups}\label{fig:q6a_hist_markups}\end{subfigure}\par\medskip
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6a_hist_profits.pdf}\caption{Profits}\label{fig:q6a_hist_profits}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws.\par}
+\end{figure}
 \tabitem{q6a_desc_stats.tex}{Descriptive statistics of prices, markups and profits (all products and markets).}{tab:q6a_desc_stats}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws; full sample, no trimming}
 
 % ---- Q6b ----
@@ -29,9 +32,12 @@
 
 % ---- Q6c ----
 \subsection*{6c}
-\figitem{q6c_hist_share_diff.pdf}{Difference between real and simulated shares, $J=3$ versus $J=5$.}{fig:q6c_hist_share_diff}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
-\figitem{q6c_scatter_shares_J3.pdf}{Real versus simulated shares, $J=3$.}{fig:q6c_scatter_shares_J3}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
-\figitem{q6c_scatter_shares_J5.pdf}{Real versus simulated shares, $J=5$.}{fig:q6c_scatter_shares_J5}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
+\begin{figure}[H]\centering\caption{Real versus simulated shares.}\label{fig:grp_q6c}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6c_hist_share_diff.pdf}\caption{Difference, real minus simulated}\label{fig:q6c_hist_share_diff}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6c_scatter_shares_J3.pdf}\caption{Real versus simulated, $J=3$}\label{fig:q6c_scatter_shares_J3}\end{subfigure}\par\medskip
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q6c_scatter_shares_J5.pdf}\caption{Real versus simulated, $J=5$}\label{fig:q6c_scatter_shares_J5}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws.\par}
+\end{figure}
 \tabitem{q6c_share_discrepancy.tex}{Discrepancy between real and simulated shares (real minus simulated), and maximum deviation of simulated shares plus outside share from one.}{tab:q6c_share_discrepancy}{true-parameter simulation of \texttt{100markets3products.mat} and \texttt{100markets5products.mat} with common consumer draws}
 
 \section*{Question 7: Demand moments and instruments}
@@ -48,8 +54,11 @@
 
 % ---- Q8a ----
 \subsection*{8a}
-\figitem{q8a_hist_delta.pdf}{Distribution of mean utilities $\delta_{jt}$ at the true parameters.}{fig:q8a_hist_delta}{true-parameter simulation of \texttt{100markets3products.mat}; $\delta_{jt}=x_{jt}'\beta-\bar\alpha p_{jt}+\xi_{jt}$, $\mu_{ijt}=-\sigma_\alpha\nu_i p_{jt}$}
-\figitem{q8a_hist_mu.pdf}{Distribution of $\mu_{ijt}$ over products, markets and simulated consumers at the true parameters (tails beyond the 1st and 99th percentiles not drawn).}{fig:q8a_hist_mu}{true-parameter simulation of \texttt{100markets3products.mat}; $\delta_{jt}=x_{jt}'\beta-\bar\alpha p_{jt}+\xi_{jt}$, $\mu_{ijt}=-\sigma_\alpha\nu_i p_{jt}$}
+\begin{figure}[H]\centering\caption{Mean utility and individual utility component at the true parameters.}\label{fig:grp_q8a}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q8a_hist_delta.pdf}\caption{Mean utility $\delta_{jt}$}\label{fig:q8a_hist_delta}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q8a_hist_mu.pdf}\caption{Individual component $\mu_{ijt}$ (tails not drawn)}\label{fig:q8a_hist_mu}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: true-parameter simulation of \texttt{100markets3products.mat}; $\delta_{jt}=x_{jt}'\beta-\bar\alpha p_{jt}+\xi_{jt}$, $\mu_{ijt}=-\sigma_\alpha\nu_i p_{jt}$.\par}
+\end{figure}
 
 % ---- Q8c ----
 \subsection*{8c}
@@ -79,8 +88,11 @@
 % ---- Q9a ----
 \subsection*{9a}
 \tabitem{q9a_estimates.tex}{Demand estimates with and without the cost shifter $w_j$ in the instrument set (standard errors in parentheses; * $p<0.1$, ** $p<0.05$, *** $p<0.01$).}{tab:q9a_estimates}{author's calculations from the stored full estimates \texttt{q8c\_*} and \texttt{q9a\_*} (T=100, J=3)}
-\figitem{q9a_scatter_profits.pdf}{Product-level profits at the estimates, with and without the cost shifter, versus real profits.}{fig:q9a_scatter_profits}{author's calculations from the stored full estimates \texttt{q8c\_*} and \texttt{q9a\_*} (T=100, J=3); profits $(p-\hat c)s$ with costs recovered under Bertrand pricing}
-\figitem{q9a_scatter_elas.pdf}{Own-price elasticities at the estimates, with and without the cost shifter, versus real elasticities.}{fig:q9a_scatter_elas}{author's calculations from the stored full estimates \texttt{q8c\_*} and \texttt{q9a\_*} (T=100, J=3)}
+\begin{figure}[H]\centering\caption{Profits and own-price elasticities at the estimates, with and without the cost shifter, against real values.}\label{fig:grp_q9a}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q9a_scatter_profits.pdf}\caption{Profits}\label{fig:q9a_scatter_profits}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q9a_scatter_elas.pdf}\caption{Own-price elasticities}\label{fig:q9a_scatter_elas}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: author's calculations from the stored full estimates \texttt{q8c\_*} and \texttt{q9a\_*} (T=100, J=3); profits $(p-\hat c)s$ with costs recovered under Bertrand pricing; author's calculations from the stored full estimates \texttt{q8c\_*} and \texttt{q9a\_*} (T=100, J=3).\par}
+\end{figure}
 
 % ---- Q9b ----
 \subsection*{9b}
@@ -93,9 +105,12 @@
 % ---- Q9e ----
 \subsection*{9e}
 \tabitem{q9e_estimates.tex}{Joint demand and supply estimates under three conduct assumptions (standard errors in parentheses; * $p<0.1$, ** $p<0.05$, *** $p<0.01$).}{tab:q9e_estimates}{author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}}
-\figitem{q9e_scatter_elas.pdf}{Real versus simulated price elasticities (all own- and cross-price elements) under the three conduct assumptions.}{fig:q9e_scatter_elas}{author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}}
+\begin{figure}[H]\centering\caption{Real versus simulated elasticities and markups under the three conduct assumptions.}\label{fig:grp_q9e}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q9e_scatter_elas.pdf}\caption{Elasticities}\label{fig:q9e_scatter_elas}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q9e_scatter_markup.pdf}\caption{Markups (axes cover the 1st to 99th percentile)}\label{fig:q9e_scatter_markup}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}.\par}
+\end{figure}
 \tabitem{q9e_elas_desc.tex}{Descriptive statistics of real and simulated elasticities.}{tab:q9e_elas_desc}{author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}}
-\figitem{q9e_scatter_markup.pdf}{Real versus simulated markups under the three conduct assumptions (axes cover the 1st to 99th percentile of the plotted values).}{fig:q9e_scatter_markup}{author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}}
 \tabitem{q9e_markup_desc.tex}{Descriptive statistics of real and simulated markups.}{tab:q9e_markup_desc}{author's calculations from the stored full estimates \texttt{q9e\_system\_*\_T100\_J3}}
 
 \section*{Question 10: Merger simulation}
@@ -108,11 +123,14 @@
 
 % ---- Q10c ----
 \subsection*{10c}
-\figitem{q10c_scatter_dp1.pdf}{Simulated price change of product 1 against upward pricing pressure, one point per market.}{fig:q10c_scatter_dp1}{author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates}
-\figitem{q10c_scatter_dp2.pdf}{Simulated price change of product 2 against upward pricing pressure, one point per market.}{fig:q10c_scatter_dp2}{author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates}
-\figitem{q10c_scatter_dcs.pdf}{Simulated change in consumer surplus against its linear approximation, one point per market.}{fig:q10c_scatter_dcs}{author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates}
-\figitem{q10c_scatter_dps.pdf}{Simulated change in producer surplus against its linear approximation, one point per market.}{fig:q10c_scatter_dps}{author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates}
-\figitem{q10c_scatter_dts.pdf}{Simulated change in total surplus against its linear approximation, one point per market.}{fig:q10c_scatter_dts}{author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates}
+\begin{figure}[H]\centering\caption{Simulated merger effects against their linear (upward pricing pressure) approximations, one point per market.}\label{fig:grp_q10c}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q10c_scatter_dp1.pdf}\caption{Price change of product 1}\label{fig:q10c_scatter_dp1}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q10c_scatter_dp2.pdf}\caption{Price change of product 2}\label{fig:q10c_scatter_dp2}\end{subfigure}\par\medskip
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q10c_scatter_dcs.pdf}\caption{Change in consumer surplus}\label{fig:q10c_scatter_dcs}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q10c_scatter_dps.pdf}\caption{Change in producer surplus}\label{fig:q10c_scatter_dps}\end{subfigure}\par\medskip
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q10c_scatter_dts.pdf}\caption{Change in total surplus}\label{fig:q10c_scatter_dts}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: author's calculations: merger counterfactual (firms 1 and 2, no cost efficiencies) at the estimates of \texttt{q9e\_system\_bertrand\_T100\_J3}; diversion ratios and $\mathrm{UPP}_j=D_{jk}(p_k-c_k)$ from the pre-merger estimates.\par}
+\end{figure}
 
 \section*{Question 11: Newer instruments and substitution diagnostics}
 
@@ -122,10 +140,17 @@
 \tabitem{q11a_estimates_all.tex}{Estimates and final GMM objective by instrument set, T=100, J=5 (standard errors in parentheses; * $p<0.1$, ** $p<0.05$, *** $p<0.01$).}{tab:q11a_estimates_all}{author's calculations from the stored full estimates \texttt{q11a\_*\_T100\_J5}; best start of each. No fixed effects are used in any specification. (n.a.): estimated variance not positive; very large standard errors indicate weak identification.}
 \tabitem{q11a_sensitivity.tex}{Sensitivity to starting values, T=100, J=5.}{tab:q11a_sensitivity}{author's calculations from the stored full estimates \texttt{q11a\_*\_T100\_J5} and the corresponding \texttt{*\_failed\_starts} files; summary over all starting points}
 
+% ---- Q11b ----
+\subsection*{11b}
+\tabitem{q11b_fe_variation.tex}{Variation of the price and of each instrument explained by market and product fixed effects, T=100, J=5; the last two columns show what remains after both sets of effects.}{tab:q11b_fe_variation}{author's calculations from \texttt{100markets5products.mat}; $R^2$ from regressing each variable on market dummies, product dummies, or both (balanced panel)}
+
 % ---- Q11c ----
 \subsection*{11c}
-\figitem{q11c_scatter_semielas.pdf}{Own-price semi-elasticity against price, all product-markets.}{fig:q11c_scatter_semielas}{author's calculations at the stored estimates \texttt{q11a\_gh\_hausman\_T100\_J5}; $\eta_{jt}=-s_{jt}^{-1}\partial s_{jt}/\partial p_{jt}$}
-\figitem{q11c_scatter_semielas_restricted.pdf}{Own-price semi-elasticity against price, restricted sample with small approximation error ($|i^{scp}_{jt}/\eta_{jt}|<0.25$).}{fig:q11c_scatter_semielas_restricted}{author's calculations at the stored estimates \texttt{q11a\_gh\_hausman\_T100\_J5}; $\eta_{jt}=-s_{jt}^{-1}\partial s_{jt}/\partial p_{jt}$; approximation-error ratio as in \texttt{pset\_io}}
+\begin{figure}[H]\centering\caption{Own-price semi-elasticity against price.}\label{fig:grp_q11c}
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q11c_scatter_semielas.pdf}\caption{All product-markets}\label{fig:q11c_scatter_semielas}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering\includegraphics[width=\linewidth]{q11c_scatter_semielas_restricted.pdf}\caption{Restricted sample ($|i^{scp}_{jt}/\eta_{jt}|<0.25$)}\label{fig:q11c_scatter_semielas_restricted}\end{subfigure}\par\medskip
+{\raggedright\noindent\footnotesize Source: author's calculations at the stored estimates \texttt{q11a\_gh\_hausman\_T100\_J5}; $\eta_{jt}=-s_{jt}^{-1}\partial s_{jt}/\partial p_{jt}$; author's calculations at the stored estimates \texttt{q11a\_gh\_hausman\_T100\_J5}; $\eta_{jt}=-s_{jt}^{-1}\partial s_{jt}/\partial p_{jt}$; approximation-error ratio as in \texttt{pset\_io}.\par}
+\end{figure}
 \tabitem{q11c_regressions.tex}{Flexible regression of the own-price semi-elasticity on price and characteristics (the same specification in every column). Columns differ only in the sample: the cut-off on $|i^{scp}_{jt}/\eta_{jt}|$ falls from left to right, so the sample becomes more restricted (heteroskedasticity-robust standard errors in parentheses; * $p<0.1$, ** $p<0.05$, *** $p<0.01$).}{tab:q11c_regressions}{author's calculations at the stored estimates \texttt{q11a\_gh\_hausman\_T100\_J5}; $\eta_{jt}=-s_{jt}^{-1}\partial s_{jt}/\partial p_{jt}$; each column keeps the product-markets with $|i^{scp}_{jt}/\eta_{jt}|$ below the cut-off in the header}
 
 % ---- Q11d ----
