@@ -394,7 +394,8 @@ module blp
         # Seed globally
         Random.seed!(704)
 
-        sigma0_ = clamp.(randn(Ns) * 0.5 .+ 1, sigma_lower, sigma_upper);
+        # starts are kept strictly inside the bounds (Fminbox needs an interior start even when sigma_lower = 0)
+        sigma0_ = clamp.(randn(Ns) * 0.5 .+ 1, max(sigma_lower, 1e-2), sigma_upper);
 
         results = Vector{Any}(nothing, Ns)
         lk = ReentrantLock()
